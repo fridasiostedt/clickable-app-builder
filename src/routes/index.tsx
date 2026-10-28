@@ -69,7 +69,7 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>(seed);
   const [selected, setSelected] = useState(iso(today));
   const [overlay, setOverlay] = useState<"sun" | "storm" | null>(null);
-  const overlayTimer = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const overlayTimer = useRef<number | null>(null);
   const previousDay = useRef(selected);
 
   useEffect(() => {
