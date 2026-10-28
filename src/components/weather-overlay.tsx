@@ -1,4 +1,4 @@
-type WeatherOverlayProps = { kind: "sun" | "storm"; taskTitle?: string };
+type WeatherOverlayProps = { kind: "sun" | "storm"; taskTitle?: string | undefined };
 
 export function WeatherOverlay({ kind, taskTitle }: WeatherOverlayProps) {
   const sunny = kind === "sun";
