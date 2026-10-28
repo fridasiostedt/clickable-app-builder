@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Home, Plus, Trash2, User, Check } from "lucide-react";
 import forest from "@/assets/forest.jpg";
 
@@ -136,7 +136,6 @@ function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: 
               <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
               <p className="mt-1 truncate text-xl font-medium text-sage">Hej Jonatan!</p>
             </div>
-            {list.length > 0 && (allDone ? <SunIcon className="h-10 w-10 ml-auto shrink-0" /> : <StormIcon className="h-10 w-10 ml-auto shrink-0" />)}
           </div>
           <div className="flex shrink-0 gap-1.5">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
@@ -147,7 +146,7 @@ function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: 
             {list.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
             <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-4">
-              <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
+              <button aria-label="Klar" onClick={() => toggle(t)}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
               </button>
@@ -155,7 +154,6 @@ function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: 
                 <p className={`truncate font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
-              {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
               <button aria-label="Ta bort" onClick={() => save(tasks.filter((x) => x.id !== t.id))}><Trash2 size={18} /></button>
             </div>
           ))}
