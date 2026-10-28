@@ -108,11 +108,24 @@ function App() {
   );
 }
 
-function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void }) {
+function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void; showOverlay: (kind: "sun" | "storm") => void }) {
   const d = new Date(selected + "T00:00");
   const list = tasks.filter((t) => t.date === selected);
-  const allDone = list.length > 0 && list.every((t) => t.done);
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
+  const stormShownFor = useRef<string | null>(null);
+
+  // Dagen är slut och uppgifter saknas -> åskmoln tar över skärmen (en gång per dag)
+  useEffect(() => {
+    if (selected < iso(today) && list.some((t) => !t.done) && stormShownFor.current !== selected) {
+      stormShownFor.current = selected;
+      showOverlay("storm");
+    }
+  }, [selected, tasks]);
+
+  const toggle = (t: Task) => {
+    save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x));
+    if (!t.done) showOverlay("sun");
+  };
   return (
     <>
       <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-44 w-full object-cover" />
