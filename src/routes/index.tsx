@@ -74,8 +74,8 @@ function App() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
-      <header className="flex items-center justify-between border-b border-border px-8 py-5 sm:py-6">
-        <h1 className="text-xl font-bold tracking-widest sm:text-2xl">TO-DO</h1>
+      <header className="flex items-center justify-between border-b border-border px-4 py-3">
+        <h1 className="text-lg font-bold tracking-widest">TO-DO</h1>
         <button aria-label="Profil" className="flex h-9 w-9 items-center justify-center rounded-full bg-sage text-sage-foreground"><User size={16} /></button>
       </header>
       <main className="flex-1 pb-28">
@@ -99,22 +99,22 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   return (
     <>
-      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-64 w-full object-cover md:h-96" />
-      <div className="px-8">
-        <div className="mt-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 rounded-3xl bg-card px-8 py-6 text-card-foreground">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
-              <p className="mt-1 text-2xl font-medium text-sage sm:text-3xl">Hej Jonatan!</p>
+      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-44 w-full object-cover" />
+      <div className="px-4">
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <div className="flex min-w-0 items-center gap-3 rounded-3xl bg-card px-5 py-4 text-card-foreground">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
+              <p className="mt-1 truncate text-xl font-medium text-sage">Hej Jonatan!</p>
             </div>
-            {list.length > 0 && (allDone ? <SunIcon className="h-12 w-12 ml-auto" /> : <StormIcon className="h-12 w-12 ml-auto" />)}
+            {list.length > 0 && (allDone ? <SunIcon className="h-10 w-10 ml-auto shrink-0" /> : <StormIcon className="h-10 w-10 ml-auto shrink-0" />)}
           </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-1.5">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
             <button aria-label="Nästa dag" onClick={() => shift(1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronRight size={16} /></button>
           </div>
         </div>
-        <div className="mt-8 grid gap-4 rounded-3xl bg-card p-5 text-card-foreground sm:grid-cols-2 sm:p-6">
+        <div className="mt-5 grid gap-3 rounded-3xl bg-card p-4 text-card-foreground">
             {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground sm:col-span-2">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
             <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-card-foreground/70 px-5 py-6 sm:px-6">
@@ -122,8 +122,8 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
               </button>
-              <div className="flex-1">
-                <p className={`font-bold sm:text-lg ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
+              <div className="min-w-0 flex-1">
+                <p className={`truncate font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
               {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
