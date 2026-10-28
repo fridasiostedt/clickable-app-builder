@@ -27,6 +27,40 @@ const seed: Task[] = [
 const MONTHS = ["januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"];
 const DAYS = ["söndag","måndag","tisdag","onsdag","torsdag","fredag","lördag"];
 
+function SunIcon({ className = "h-8 w-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <g className="w-sun-rays text-sun" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <line x1="12" y1="2.5" x2="12" y2="5" />
+        <line x1="12" y1="19" x2="12" y2="21.5" />
+        <line x1="2.5" y1="12" x2="5" y2="12" />
+        <line x1="19" y1="12" x2="21.5" y2="12" />
+        <line x1="5.3" y1="5.3" x2="7" y2="7" />
+        <line x1="17" y1="17" x2="18.7" y2="18.7" />
+        <line x1="5.3" y1="18.7" x2="7" y2="17" />
+        <line x1="17" y1="7" x2="18.7" y2="5.3" />
+      </g>
+      <circle className="w-sun-core text-sun" cx="12" cy="12" r="5" fill="currentColor" />
+    </svg>
+  );
+}
+
+function StormIcon({ className = "h-8 w-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <g className="w-cloud">
+        <path className="text-cloud" d="M6.8 13.5a4 4 0 0 1 .6-7.95A5 5 0 0 1 17.1 7a3.25 3.25 0 0 1 .35 6.5H6.8z" fill="currentColor" />
+      </g>
+      <g className="text-rain" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+        <line className="w-drop" x1="8.2" y1="15" x2="8.2" y2="16.8" style={{ animationDelay: "0s" }} />
+        <line className="w-drop" x1="11.8" y1="15" x2="11.8" y2="16.8" style={{ animationDelay: "0.4s" }} />
+        <line className="w-drop" x1="15.4" y1="15" x2="15.4" y2="16.8" style={{ animationDelay: "0.8s" }} />
+      </g>
+      <polygon className="w-bolt text-bolt" points="12.6,14.5 10.4,18.8 12,18.8 10.9,22 14.4,17.2 12.7,17.2 14,14.5" fill="currentColor" />
+    </svg>
+  );
+}
+
 function App() {
   const [view, setView] = useState<"home" | "add">("home");
   const [tasks, setTasks] = useState<Task[]>(seed);
@@ -61,15 +95,19 @@ function App() {
 function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void }) {
   const d = new Date(selected + "T00:00");
   const list = tasks.filter((t) => t.date === selected);
+  const allDone = list.length > 0 && list.every((t) => t.done);
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   return (
     <>
       <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-36 w-full object-cover" />
       <div className="px-4">
         <div className="mt-8 flex items-center justify-between">
-          <div className="rounded-3xl bg-card px-4 py-4 text-card-foreground">
-            <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
-            <p className="mt-1 text-xl font-medium text-sage">Hej Jonatan!</p>
+          <div className="flex items-center gap-3 rounded-3xl bg-card px-4 py-4 text-card-foreground">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
+              <p className="mt-1 text-xl font-medium text-sage">Hej Jonatan!</p>
+            </div>
+            {list.length > 0 && (allDone ? <SunIcon className="h-9 w-9 ml-auto" /> : <StormIcon className="h-9 w-9 ml-auto" />)}
           </div>
           <div className="flex gap-2">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
@@ -88,6 +126,7 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
                 <p className={`font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
+              {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
               <button aria-label="Ta bort" onClick={() => save(tasks.filter((x) => x.id !== t.id))}><Trash2 size={18} /></button>
             </div>
           ))}
