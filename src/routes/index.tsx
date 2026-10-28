@@ -74,8 +74,8 @@ function App() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
-      <header className="flex items-center justify-between border-b border-border px-8 py-5 sm:py-6">
-        <h1 className="text-xl font-bold tracking-widest sm:text-2xl">TO-DO</h1>
+      <header className="flex items-center justify-between border-b border-border px-4 py-3">
+        <h1 className="text-lg font-bold tracking-widest">TO-DO</h1>
         <button aria-label="Profil" className="flex h-9 w-9 items-center justify-center rounded-full bg-sage text-sage-foreground"><User size={16} /></button>
       </header>
       <main className="flex-1 pb-28">
@@ -83,7 +83,7 @@ function App() {
           ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
-      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-6xl -translate-x-1/2 items-center justify-between border-t border-border bg-background px-12">
+      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-10">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
         <button aria-label="Kalender" onClick={() => setView("add")}><Calendar size={28} /></button>
@@ -99,31 +99,31 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   return (
     <>
-      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-64 w-full object-cover md:h-96" />
-      <div className="px-8">
-        <div className="mt-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 rounded-3xl bg-card px-8 py-6 text-card-foreground">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
-              <p className="mt-1 text-2xl font-medium text-sage sm:text-3xl">Hej Jonatan!</p>
+      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-44 w-full object-cover" />
+      <div className="px-4">
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <div className="flex min-w-0 items-center gap-3 rounded-3xl bg-card px-5 py-4 text-card-foreground">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
+              <p className="mt-1 truncate text-xl font-medium text-sage">Hej Jonatan!</p>
             </div>
-            {list.length > 0 && (allDone ? <SunIcon className="h-12 w-12 ml-auto" /> : <StormIcon className="h-12 w-12 ml-auto" />)}
+            {list.length > 0 && (allDone ? <SunIcon className="h-10 w-10 ml-auto shrink-0" /> : <StormIcon className="h-10 w-10 ml-auto shrink-0" />)}
           </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-1.5">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
             <button aria-label="Nästa dag" onClick={() => shift(1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronRight size={16} /></button>
           </div>
         </div>
-        <div className="mt-8 grid gap-4 rounded-3xl bg-card p-5 text-card-foreground sm:grid-cols-2 sm:p-6">
-            {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground sm:col-span-2">Inga uppgifter. Tryck på + för att lägga till.</p>}
+        <div className="mt-5 grid gap-3 rounded-3xl bg-card p-4 text-card-foreground">
+            {list.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
-            <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-card-foreground/70 px-5 py-6 sm:px-6">
+            <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-4">
               <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
               </button>
-              <div className="flex-1">
-                <p className={`font-bold sm:text-lg ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
+              <div className="min-w-0 flex-1">
+                <p className={`truncate font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
               {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
@@ -150,14 +150,14 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
   const pill = (on: boolean) => `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${on ? "bg-sage border-sage text-sage-foreground" : "border-card-foreground"}`;
 
   return (
-    <div className="grid gap-6 px-8 pt-8 text-card-foreground lg:grid-cols-2 lg:items-start">
-      <div className="space-y-6">
-        <div className="rounded-3xl bg-card px-8 py-6">
+    <div className="grid gap-4 px-4 pt-4 text-card-foreground">
+      <div className="space-y-4">
+        <div className="rounded-3xl bg-card px-5 py-4">
           <p className="text-xs font-medium uppercase">Vad vill du göra?</p>
           <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Skriv uppgift här.."
             className="mt-1 w-full bg-transparent text-lg font-medium text-sage placeholder:text-sage outline-none" />
         </div>
-        <div className="rounded-3xl bg-card p-6">
+        <div className="rounded-3xl bg-card p-4">
           <div className="flex items-center justify-between border-b-2 border-muted-foreground/40 pb-2">
             <span className="flex items-center gap-2 text-sm font-medium"><Clock size={14} /> TID</span>
             <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="rounded-full border border-card-foreground bg-transparent px-6 py-1.5 text-sm" />
@@ -172,7 +172,7 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
           </div>
         </div>
       </div>
-      <div className="rounded-3xl bg-card p-6">
+      <div className="rounded-3xl bg-card p-4">
         <div className="mb-3 flex gap-3">
           <button className={pill(date === iso(today))} onClick={() => setDate(iso(today))}>Idag ({today.getDate()}:e)</button>
           <button className={pill(date === iso(tomorrow))} onClick={() => setDate(iso(tomorrow))}>Imorgon</button>
