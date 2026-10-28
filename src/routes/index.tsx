@@ -172,7 +172,7 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
           </div>
         </div>
       </div>
-      <div className="rounded-3xl bg-card p-6">
+      <div className="rounded-3xl bg-card p-4">
         <div className="mb-3 flex gap-3">
           <button className={pill(date === iso(today))} onClick={() => setDate(iso(today))}>Idag ({today.getDate()}:e)</button>
           <button className={pill(date === iso(tomorrow))} onClick={() => setDate(iso(tomorrow))}>Imorgon</button>
