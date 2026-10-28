@@ -73,7 +73,7 @@ function App() {
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-3xl flex-col bg-background text-foreground">
+    <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
       <header className="flex items-center justify-between border-b border-border px-8 py-5 sm:py-6">
         <h1 className="text-xl font-bold tracking-widest sm:text-2xl">TO-DO</h1>
         <button aria-label="Profil" className="flex h-9 w-9 items-center justify-center rounded-full bg-sage text-sage-foreground"><User size={16} /></button>
@@ -83,7 +83,7 @@ function App() {
           ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
-      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-3xl -translate-x-1/2 items-center justify-between border-t border-border bg-background px-12">
+      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-6xl -translate-x-1/2 items-center justify-between border-t border-border bg-background px-12">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
         <button aria-label="Kalender" onClick={() => setView("add")}><Calendar size={28} /></button>
@@ -99,23 +99,23 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   return (
     <>
-      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-52 w-full object-cover md:h-64" />
-      <div className="px-6">
+      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-64 w-full object-cover md:h-96" />
+      <div className="px-8">
         <div className="mt-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 rounded-3xl bg-card px-6 py-5 text-card-foreground">
+          <div className="flex items-center gap-4 rounded-3xl bg-card px-8 py-6 text-card-foreground">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
-              <p className="mt-1 text-xl font-medium text-sage">Hej Jonatan!</p>
+              <p className="text-sm font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
+              <p className="mt-1 text-2xl font-medium text-sage sm:text-3xl">Hej Jonatan!</p>
             </div>
-            {list.length > 0 && (allDone ? <SunIcon className="h-9 w-9 ml-auto" /> : <StormIcon className="h-9 w-9 ml-auto" />)}
+            {list.length > 0 && (allDone ? <SunIcon className="h-12 w-12 ml-auto" /> : <StormIcon className="h-12 w-12 ml-auto" />)}
           </div>
           <div className="flex gap-2">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
             <button aria-label="Nästa dag" onClick={() => shift(1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronRight size={16} /></button>
           </div>
         </div>
-        <div className="mt-8 space-y-4 rounded-3xl bg-card p-4 text-card-foreground sm:p-5">
-          {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
+        <div className="mt-8 grid gap-4 rounded-3xl bg-card p-5 text-card-foreground sm:grid-cols-2 sm:p-6">
+            {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground sm:col-span-2">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
             <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-card-foreground/70 px-5 py-6 sm:px-6">
               <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
@@ -150,18 +150,34 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
   const pill = (on: boolean) => `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${on ? "bg-sage border-sage text-sage-foreground" : "border-card-foreground"}`;
 
   return (
-    <div className="space-y-6 px-6 pt-6 text-card-foreground">
-      <div className="rounded-3xl bg-card px-6 py-4">
-        <p className="text-xs font-medium uppercase">Vad vill du göra?</p>
-        <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Skriv uppgift här.."
-          className="mt-1 w-full bg-transparent text-lg font-medium text-sage placeholder:text-sage outline-none" />
+    <div className="grid gap-6 px-8 pt-8 text-card-foreground lg:grid-cols-2 lg:items-start">
+      <div className="space-y-6">
+        <div className="rounded-3xl bg-card px-8 py-6">
+          <p className="text-xs font-medium uppercase">Vad vill du göra?</p>
+          <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Skriv uppgift här.."
+            className="mt-1 w-full bg-transparent text-lg font-medium text-sage placeholder:text-sage outline-none" />
+        </div>
+        <div className="rounded-3xl bg-card p-6">
+          <div className="flex items-center justify-between border-b-2 border-muted-foreground/40 pb-2">
+            <span className="flex items-center gap-2 text-sm font-medium"><Clock size={14} /> TID</span>
+            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="rounded-full border border-card-foreground bg-transparent px-6 py-1.5 text-sm" />
+          </div>
+          <p className="mt-3 text-sm font-medium">PÅMINNELSE</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {["Ingen", "10 min innan", "30 min innan"].map((r) => <button key={r} className={pill(reminder === r) + " px-2"} onClick={() => setReminder(r)}>{r}</button>)}
+          </div>
+          <div className="mt-5 text-center">
+            <button disabled={!title.trim()} onClick={() => onSave({ id: crypto.randomUUID(), title: title.trim(), date, time, reminder: reminder === "Ingen" ? "ingen" : reminder, done: false })}
+              className="rounded-full bg-sage px-8 py-2.5 text-sm font-medium text-sage-foreground disabled:opacity-50">Spara uppgift</button>
+          </div>
+        </div>
       </div>
-      <div className="rounded-3xl bg-card p-3">
+      <div className="rounded-3xl bg-card p-6">
         <div className="mb-3 flex gap-3">
           <button className={pill(date === iso(today))} onClick={() => setDate(iso(today))}>Idag ({today.getDate()}:e)</button>
           <button className={pill(date === iso(tomorrow))} onClick={() => setDate(iso(tomorrow))}>Imorgon</button>
         </div>
-        <div className="rounded-2xl border border-card-foreground p-3">
+        <div className="rounded-2xl border border-card-foreground p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="font-medium uppercase">{MONTHS[month.getMonth()]} {month.getFullYear()}</p>
             <div className="flex gap-2">
@@ -169,27 +185,13 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
               <button aria-label="Nästa månad" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}><ChevronRight size={16} /></button>
             </div>
           </div>
-          <div className="grid grid-cols-7 gap-y-1 text-center text-xs">
+          <div className="grid grid-cols-7 gap-y-2 text-center text-sm">
             {["M","T","O","T","F","L","S"].map((d, i) => <span key={i} className="pb-1 font-medium">{d}</span>)}
             {rows.map((c) => {
               const k = iso(c); const out = c.getMonth() !== month.getMonth();
-              return <button key={k} onClick={() => setDate(k)} className={`mx-auto flex h-7 w-7 items-center justify-center rounded-full ${k === date ? "bg-sage text-sage-foreground" : out ? "opacity-30" : ""}`}>{c.getDate()}</button>;
+              return <button key={k} onClick={() => setDate(k)} className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full ${k === date ? "bg-sage text-sage-foreground" : out ? "opacity-30" : ""}`}>{c.getDate()}</button>;
             })}
           </div>
-        </div>
-      </div>
-      <div className="rounded-3xl bg-card p-4">
-        <div className="flex items-center justify-between border-b-2 border-muted-foreground/40 pb-2">
-          <span className="flex items-center gap-2 text-sm font-medium"><Clock size={14} /> TID</span>
-          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="rounded-full border border-card-foreground bg-transparent px-6 py-1.5 text-sm" />
-        </div>
-        <p className="mt-3 text-sm font-medium">PÅMINNELSE</p>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {["Ingen", "10 min innan", "30 min innan"].map((r) => <button key={r} className={pill(reminder === r) + " px-2"} onClick={() => setReminder(r)}>{r}</button>)}
-        </div>
-        <div className="mt-5 text-center">
-          <button disabled={!title.trim()} onClick={() => onSave({ id: crypto.randomUUID(), title: title.trim(), date, time, reminder: reminder === "Ingen" ? "ingen" : reminder, done: false })}
-            className="rounded-full bg-sage px-8 py-2.5 text-sm font-medium text-sage-foreground disabled:opacity-50">Spara uppgift</button>
         </div>
       </div>
     </div>
