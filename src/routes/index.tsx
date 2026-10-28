@@ -150,14 +150,14 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
   const pill = (on: boolean) => `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${on ? "bg-sage border-sage text-sage-foreground" : "border-card-foreground"}`;
 
   return (
-    <div className="grid gap-6 px-8 pt-8 text-card-foreground lg:grid-cols-2 lg:items-start">
-      <div className="space-y-6">
-        <div className="rounded-3xl bg-card px-8 py-6">
+    <div className="grid gap-4 px-4 pt-4 text-card-foreground">
+      <div className="space-y-4">
+        <div className="rounded-3xl bg-card px-5 py-4">
           <p className="text-xs font-medium uppercase">Vad vill du göra?</p>
           <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Skriv uppgift här.."
             className="mt-1 w-full bg-transparent text-lg font-medium text-sage placeholder:text-sage outline-none" />
         </div>
-        <div className="rounded-3xl bg-card p-6">
+        <div className="rounded-3xl bg-card p-4">
           <div className="flex items-center justify-between border-b-2 border-muted-foreground/40 pb-2">
             <span className="flex items-center gap-2 text-sm font-medium"><Clock size={14} /> TID</span>
             <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="rounded-full border border-card-foreground bg-transparent px-6 py-1.5 text-sm" />
