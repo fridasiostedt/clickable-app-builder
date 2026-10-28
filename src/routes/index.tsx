@@ -117,13 +117,13 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
         <div className="mt-8 space-y-4 rounded-3xl bg-card p-4 text-card-foreground sm:p-5">
           {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
-            <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-5">
+            <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-card-foreground/70 px-5 py-6 sm:px-6">
               <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
               </button>
               <div className="flex-1">
-                <p className={`font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
+                <p className={`font-bold sm:text-lg ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
               {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
