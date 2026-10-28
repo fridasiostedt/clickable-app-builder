@@ -198,3 +198,21 @@
 .w-bolt {
   animation: w-bolt-flash 2.4s ease-in-out infinite;
 }
+
+/* Full-screen weather takeover overlays */
+@keyframes w-overlay-fade {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes w-takeover-grow {
+  from { transform: scale(0.2); }
+  to { transform: scale(1); }
+}
+.w-overlay {
+  animation: w-overlay-fade 2.8s ease-in-out forwards;
+}
+.w-takeover {
+  animation: w-takeover-grow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}

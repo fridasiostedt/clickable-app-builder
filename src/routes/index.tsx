@@ -65,12 +65,18 @@ function App() {
   const [view, setView] = useState<"home" | "add">("home");
   const [tasks, setTasks] = useState<Task[]>(seed);
   const [selected, setSelected] = useState(iso(today));
+  const [overlay, setOverlay] = useState<"sun" | "storm" | null>(null);
 
   useEffect(() => {
     const s = localStorage.getItem("todo-tasks");
     if (s) setTasks(JSON.parse(s));
   }, []);
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
+
+  const showOverlay = (kind: "sun" | "storm") => {
+    setOverlay(kind);
+    window.setTimeout(() => setOverlay(null), 2800);
+  };
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
@@ -80,9 +86,19 @@ function App() {
       </header>
       <main className="flex-1 pb-28">
         {view === "home"
-          ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
+          ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} showOverlay={showOverlay} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
+      {overlay === "sun" && (
+        <div className="w-overlay fixed inset-0 z-50 flex items-center justify-center bg-sun" aria-hidden="true">
+          <SunIcon className="w-takeover h-64 w-64" />
+        </div>
+      )}
+      {overlay === "storm" && (
+        <div className="w-overlay fixed inset-0 z-50 flex items-center justify-center bg-background" aria-hidden="true">
+          <StormIcon className="w-takeover h-64 w-64" />
+        </div>
+      )}
       <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-10">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
