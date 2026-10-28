@@ -73,9 +73,9 @@ function App() {
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background text-foreground">
-      <header className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h1 className="text-lg font-bold tracking-widest">TO-DO</h1>
+    <div className="mx-auto flex min-h-screen max-w-3xl flex-col bg-background text-foreground">
+      <header className="flex items-center justify-between border-b border-border px-8 py-5 sm:py-6">
+        <h1 className="text-xl font-bold tracking-widest sm:text-2xl">TO-DO</h1>
         <button aria-label="Profil" className="flex h-9 w-9 items-center justify-center rounded-full bg-sage text-sage-foreground"><User size={16} /></button>
       </header>
       <main className="flex-1 pb-28">
@@ -83,7 +83,7 @@ function App() {
           ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
-      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-8">
+      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-3xl -translate-x-1/2 items-center justify-between border-t border-border bg-background px-12">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
         <button aria-label="Kalender" onClick={() => setView("add")}><Calendar size={28} /></button>
@@ -99,10 +99,10 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   return (
     <>
-      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-36 w-full object-cover" />
-      <div className="px-4">
+      <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-52 w-full object-cover md:h-64" />
+      <div className="px-6">
         <div className="mt-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 rounded-3xl bg-card px-4 py-4 text-card-foreground">
+          <div className="flex items-center gap-3 rounded-3xl bg-card px-6 py-5 text-card-foreground">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
               <p className="mt-1 text-xl font-medium text-sage">Hej Jonatan!</p>
@@ -114,7 +114,7 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
             <button aria-label="Nästa dag" onClick={() => shift(1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronRight size={16} /></button>
           </div>
         </div>
-        <div className="mt-8 space-y-4 rounded-3xl bg-card p-3 text-card-foreground">
+        <div className="mt-8 space-y-4 rounded-3xl bg-card p-4 text-card-foreground sm:p-5">
           {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
             <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-5">
@@ -150,7 +150,7 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
   const pill = (on: boolean) => `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${on ? "bg-sage border-sage text-sage-foreground" : "border-card-foreground"}`;
 
   return (
-    <div className="space-y-6 px-4 pt-4 text-card-foreground">
+    <div className="space-y-6 px-6 pt-6 text-card-foreground">
       <div className="rounded-3xl bg-card px-6 py-4">
         <p className="text-xs font-medium uppercase">Vad vill du göra?</p>
         <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Skriv uppgift här.."
