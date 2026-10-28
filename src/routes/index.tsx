@@ -68,7 +68,7 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
       <div className="px-4">
         <div className="mt-8 flex items-center justify-between">
           <div className="rounded-3xl bg-card px-4 py-4 text-card-foreground">
-            <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {MONTHS[d.getMonth()].slice(0, 3)} {d.getFullYear()}</p>
+            <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
             <p className="mt-1 text-xl font-medium text-sage">Hej Jonatan!</p>
           </div>
           <div className="flex gap-2">
@@ -107,7 +107,7 @@ function AddView({ onSave }: { onSave: (t: Task) => void }) {
 
   const first = (month.getDay() + 6) % 7;
   const cells = Array.from({ length: 42 }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i - first + 1));
-  const rows = cells[35].getMonth() === month.getMonth() ? cells : cells.slice(0, 35);
+  const rows = cells[35]?.getMonth() === month.getMonth() ? cells : cells.slice(0, 35);
   const pill = (on: boolean) => `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${on ? "bg-sage border-sage text-sage-foreground" : "border-card-foreground"}`;
 
   return (
