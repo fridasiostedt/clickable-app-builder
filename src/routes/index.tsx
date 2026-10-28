@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Home, Plus, Trash2, User, Check } from "lucide-react";
 import forest from "@/assets/forest.jpg";
+import { shouldShowStormOnDayChange } from "@/lib/task-weather";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -10,6 +11,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Enkel att-göra-lista med tider och påminnelser." },
       { property: "og:title", content: "To-Do – Dina uppgifter" },
       { property: "og:description", content: "Enkel att-göra-lista med tider och påminnelser." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: App,
@@ -66,6 +69,8 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>(seed);
   const [selected, setSelected] = useState(iso(today));
   const [overlay, setOverlay] = useState<"sun" | "storm" | null>(null);
+  const overlayTimer = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const previousDay = useRef(selected);
 
   useEffect(() => {
     const s = localStorage.getItem("todo-tasks");
@@ -73,10 +78,23 @@ function App() {
   }, []);
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
 
-  const showOverlay = (kind: "sun" | "storm") => {
+  const showOverlay = useCallback((kind: "sun" | "storm") => {
+    if (overlayTimer.current !== null) window.clearTimeout(overlayTimer.current);
     setOverlay(kind);
-    window.setTimeout(() => setOverlay(null), 2800);
-  };
+    overlayTimer.current = window.setTimeout(() => setOverlay(null), 2800);
+  }, []);
+
+  useEffect(() => () => {
+    if (overlayTimer.current !== null) window.clearTimeout(overlayTimer.current);
+  }, []);
+
+  useEffect(() => {
+    const previous = previousDay.current;
+    previousDay.current = selected;
+    if (shouldShowStormOnDayChange(tasks, previous, selected, iso(new Date()))) {
+      showOverlay("storm");
+    }
+  }, [selected, tasks, showOverlay]);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
@@ -112,16 +130,6 @@ function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: 
   const d = new Date(selected + "T00:00");
   const list = tasks.filter((t) => t.date === selected);
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
-  const stormShownFor = useRef<string | null>(null);
-
-  // Dagen är slut och uppgifter saknas -> åskmoln tar över skärmen (en gång per dag)
-  useEffect(() => {
-    if (selected < iso(today) && list.some((t) => !t.done) && stormShownFor.current !== selected) {
-      stormShownFor.current = selected;
-      showOverlay("storm");
-    }
-  }, [selected, tasks]);
-
   const toggle = (t: Task) => {
     save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x));
     if (!t.done) showOverlay("sun");
