@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep day-change weather decisions in the browser-safe `src/lib/task-weather.ts` helper so navigation rules can be tested independently of animations.
+- Keep temporary weather presentation in `src/components/weather-overlay.tsx` and theme its effects in global CSS so task navigation and animation styling remain independent.

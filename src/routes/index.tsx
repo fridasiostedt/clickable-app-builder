@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Home, Plus, Trash2, User, Check } from "lucide-react";
 import forest from "@/assets/forest.jpg";
 import { shouldShowStormOnDayChange } from "@/lib/task-weather";
+import { WeatherOverlay } from "@/components/weather-overlay";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,45 +31,12 @@ const seed: Task[] = [
 const MONTHS = ["januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"];
 const DAYS = ["söndag","måndag","tisdag","onsdag","torsdag","fredag","lördag"];
 
-function SunIcon({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <g className="w-sun-rays text-sun" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <line x1="12" y1="2.5" x2="12" y2="5" />
-        <line x1="12" y1="19" x2="12" y2="21.5" />
-        <line x1="2.5" y1="12" x2="5" y2="12" />
-        <line x1="19" y1="12" x2="21.5" y2="12" />
-        <line x1="5.3" y1="5.3" x2="7" y2="7" />
-        <line x1="17" y1="17" x2="18.7" y2="18.7" />
-        <line x1="5.3" y1="18.7" x2="7" y2="17" />
-        <line x1="17" y1="7" x2="18.7" y2="5.3" />
-      </g>
-      <circle className="w-sun-core text-sun" cx="12" cy="12" r="5" fill="currentColor" />
-    </svg>
-  );
-}
-
-function StormIcon({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <g className="w-cloud">
-        <path className="text-cloud" d="M6.8 13.5a4 4 0 0 1 .6-7.95A5 5 0 0 1 17.1 7a3.25 3.25 0 0 1 .35 6.5H6.8z" fill="currentColor" />
-      </g>
-      <g className="text-rain" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-        <line className="w-drop" x1="8.2" y1="15" x2="8.2" y2="16.8" style={{ animationDelay: "0s" }} />
-        <line className="w-drop" x1="11.8" y1="15" x2="11.8" y2="16.8" style={{ animationDelay: "0.4s" }} />
-        <line className="w-drop" x1="15.4" y1="15" x2="15.4" y2="16.8" style={{ animationDelay: "0.8s" }} />
-      </g>
-      <polygon className="w-bolt text-bolt" points="12.6,14.5 10.4,18.8 12,18.8 10.9,22 14.4,17.2 12.7,17.2 14,14.5" fill="currentColor" />
-    </svg>
-  );
-}
-
 function App() {
   const [view, setView] = useState<"home" | "add">("home");
   const [tasks, setTasks] = useState<Task[]>(seed);
   const [selected, setSelected] = useState(iso(today));
   const [overlay, setOverlay] = useState<"sun" | "storm" | null>(null);
+  const [overlayTitle, setOverlayTitle] = useState<string | undefined>();
   const overlayTimer = useRef<number | null>(null);
   const previousDay = useRef(selected);
 
@@ -78,8 +46,9 @@ function App() {
   }, []);
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
 
-  const showOverlay = useCallback((kind: "sun" | "storm") => {
+  const showOverlay = useCallback((kind: "sun" | "storm", taskTitle?: string) => {
     if (overlayTimer.current !== null) window.clearTimeout(overlayTimer.current);
+    setOverlayTitle(taskTitle);
     setOverlay(kind);
     overlayTimer.current = window.setTimeout(() => setOverlay(null), 2800);
   }, []);
@@ -107,16 +76,7 @@ function App() {
           ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} showOverlay={showOverlay} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
-      {overlay === "sun" && (
-        <div className="w-overlay w-overlay-sun fixed inset-0 z-50 flex items-center justify-center bg-sun" aria-hidden="true">
-          <SunIcon className="w-takeover h-64 w-64" />
-        </div>
-      )}
-      {overlay === "storm" && (
-        <div className="w-overlay fixed inset-0 z-50 flex items-center justify-center bg-background" aria-hidden="true">
-          <StormIcon className="w-takeover h-64 w-64" />
-        </div>
-      )}
+      {overlay && <WeatherOverlay key={overlay} kind={overlay} taskTitle={overlayTitle} />}
       <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-10">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
@@ -126,13 +86,13 @@ function App() {
   );
 }
 
-function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void; showOverlay: (kind: "sun" | "storm") => void }) {
+function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void; showOverlay: (kind: "sun" | "storm", taskTitle?: string) => void }) {
   const d = new Date(selected + "T00:00");
   const list = tasks.filter((t) => t.date === selected);
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
   const toggle = (t: Task) => {
     save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x));
-    if (!t.done) showOverlay("sun");
+    if (!t.done) showOverlay("sun", t.title);
   };
   return (
     <>
