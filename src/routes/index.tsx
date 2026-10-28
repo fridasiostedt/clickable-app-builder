@@ -83,7 +83,7 @@ function App() {
           ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
-      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-6xl -translate-x-1/2 items-center justify-between border-t border-border bg-background px-12">
+      <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-10">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
         <button aria-label="Kalender" onClick={() => setView("add")}><Calendar size={28} /></button>
@@ -115,9 +115,9 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
           </div>
         </div>
         <div className="mt-5 grid gap-3 rounded-3xl bg-card p-4 text-card-foreground">
-            {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground sm:col-span-2">Inga uppgifter. Tryck på + för att lägga till.</p>}
+            {list.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
-            <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-card-foreground/70 px-5 py-6 sm:px-6">
+            <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-4">
               <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
