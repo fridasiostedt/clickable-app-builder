@@ -5,4 +5,5 @@
 - [x] Anpassa layouten för laptop/skrivbord (bredare, större ytor)
 - [ ] Publicera appen på webben (avbröts av användaren — publicera när hen vill)
 - [x] Rätta och testa åskmoln vid dagbyte med en oavslutad uppgift kvar.
+- [ ] Förnya tillfälliga sol- och åskanimationer enligt referenserna utan att ändra appens design.
 
