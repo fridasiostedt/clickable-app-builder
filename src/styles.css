@@ -216,3 +216,6 @@
 .w-takeover {
   animation: w-takeover-grow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+.w-overlay-sun .text-sun {
+  color: oklch(0.99 0.03 95);
+}

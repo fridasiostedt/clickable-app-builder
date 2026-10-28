@@ -90,7 +90,7 @@ function App() {
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
       {overlay === "sun" && (
-        <div className="w-overlay fixed inset-0 z-50 flex items-center justify-center bg-sun" aria-hidden="true">
+        <div className="w-overlay w-overlay-sun fixed inset-0 z-50 flex items-center justify-center bg-sun" aria-hidden="true">
           <SunIcon className="w-takeover h-64 w-64" />
         </div>
       )}
