@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Home, Plus, Trash2, User, Check } from "lucide-react";
 import forest from "@/assets/forest.jpg";
 
@@ -65,12 +65,18 @@ function App() {
   const [view, setView] = useState<"home" | "add">("home");
   const [tasks, setTasks] = useState<Task[]>(seed);
   const [selected, setSelected] = useState(iso(today));
+  const [overlay, setOverlay] = useState<"sun" | "storm" | null>(null);
 
   useEffect(() => {
     const s = localStorage.getItem("todo-tasks");
     if (s) setTasks(JSON.parse(s));
   }, []);
   const save = (t: Task[]) => { setTasks(t); localStorage.setItem("todo-tasks", JSON.stringify(t)); };
+
+  const showOverlay = (kind: "sun" | "storm") => {
+    setOverlay(kind);
+    window.setTimeout(() => setOverlay(null), 2800);
+  };
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col bg-background text-foreground">
@@ -80,9 +86,19 @@ function App() {
       </header>
       <main className="flex-1 pb-28">
         {view === "home"
-          ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} />
+          ? <HomeView tasks={tasks} save={save} selected={selected} setSelected={setSelected} showOverlay={showOverlay} />
           : <AddView onSave={(t) => { save([...tasks, t].sort((a, b) => a.time.localeCompare(b.time))); setSelected(t.date); setView("home"); }} />}
       </main>
+      {overlay === "sun" && (
+        <div className="w-overlay w-overlay-sun fixed inset-0 z-50 flex items-center justify-center bg-sun" aria-hidden="true">
+          <SunIcon className="w-takeover h-64 w-64" />
+        </div>
+      )}
+      {overlay === "storm" && (
+        <div className="w-overlay fixed inset-0 z-50 flex items-center justify-center bg-background" aria-hidden="true">
+          <StormIcon className="w-takeover h-64 w-64" />
+        </div>
+      )}
       <nav className="fixed bottom-0 left-1/2 flex h-16 w-full max-w-md -translate-x-1/2 items-center justify-between border-t border-border bg-background px-10">
         <button aria-label="Hem" onClick={() => { setSelected(iso(today)); setView("home"); }}><Home size={28} /></button>
         <button aria-label="Ny uppgift" onClick={() => setView("add")} className="-mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-sage text-sage-foreground shadow-lg transition-transform active:scale-95"><Plus size={32} strokeWidth={3} /></button>
@@ -92,11 +108,24 @@ function App() {
   );
 }
 
-function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void }) {
+function HomeView({ tasks, save, selected, setSelected, showOverlay }: { tasks: Task[]; save: (t: Task[]) => void; selected: string; setSelected: (s: string) => void; showOverlay: (kind: "sun" | "storm") => void }) {
   const d = new Date(selected + "T00:00");
   const list = tasks.filter((t) => t.date === selected);
-  const allDone = list.length > 0 && list.every((t) => t.done);
   const shift = (n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); setSelected(iso(x)); };
+  const stormShownFor = useRef<string | null>(null);
+
+  // Dagen är slut och uppgifter saknas -> åskmoln tar över skärmen (en gång per dag)
+  useEffect(() => {
+    if (selected < iso(today) && list.some((t) => !t.done) && stormShownFor.current !== selected) {
+      stormShownFor.current = selected;
+      showOverlay("storm");
+    }
+  }, [selected, tasks]);
+
+  const toggle = (t: Task) => {
+    save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x));
+    if (!t.done) showOverlay("sun");
+  };
   return (
     <>
       <img src={forest} alt="Skogsstig" width={1280} height={640} className="h-44 w-full object-cover" />
@@ -107,7 +136,6 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
               <p className="text-xs font-medium uppercase tracking-wide">{DAYS[d.getDay()]} {d.getDate()} {(MONTHS[d.getMonth()] ?? "").slice(0, 3)} {d.getFullYear()}</p>
               <p className="mt-1 truncate text-xl font-medium text-sage">Hej Jonatan!</p>
             </div>
-            {list.length > 0 && (allDone ? <SunIcon className="h-10 w-10 ml-auto shrink-0" /> : <StormIcon className="h-10 w-10 ml-auto shrink-0" />)}
           </div>
           <div className="flex shrink-0 gap-1.5">
             <button aria-label="Föregående dag" onClick={() => shift(-1)} className="rounded-full bg-card p-2 text-card-foreground"><ChevronLeft size={16} /></button>
@@ -118,7 +146,7 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
             {list.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Inga uppgifter. Tryck på + för att lägga till.</p>}
           {list.map((t) => (
             <div key={t.id} className="flex items-center gap-3 rounded-2xl border border-card-foreground/70 px-4 py-4">
-              <button aria-label="Klar" onClick={() => save(tasks.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))}
+              <button aria-label="Klar" onClick={() => toggle(t)}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-card-foreground ${t.done ? "bg-sage border-sage text-sage-foreground" : ""}`}>
                 {t.done && <Check size={12} strokeWidth={3} />}
               </button>
@@ -126,7 +154,6 @@ function HomeView({ tasks, save, selected, setSelected }: { tasks: Task[]; save:
                 <p className={`truncate font-bold ${t.done ? "line-through opacity-50" : ""}`}>{t.title}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs"><Clock size={12} /> {t.time} • Påminnelse {t.reminder}</p>
               </div>
-              {t.done ? <SunIcon className="h-6 w-6 shrink-0" /> : <StormIcon className="h-6 w-6 shrink-0" />}
               <button aria-label="Ta bort" onClick={() => save(tasks.filter((x) => x.id !== t.id))}><Trash2 size={18} /></button>
             </div>
           ))}
